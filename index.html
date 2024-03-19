@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Product Details:</h1>
+    <h2>Sorted by popularity, displaying the title and price from the json</h2>
+    <table id="productTable">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script>
+        fetch('https://s3.amazonaws.com/open-to-cors/assignment.json')
+            .then(response => response.json())
+            .then(data => {
+                const products = data.products;
+
+                const productList = Object.keys(products).map(productId => {
+                    const product = products[productId];
+                    return {
+                        title: product.title,
+                        price: parseFloat(product.price),
+                        popularity: parseInt(product.popularity)
+                    };
+                });
+
+                productList.sort((a, b) => b.popularity - a.popularity);
+
+                const productTableBody = document.querySelector('#productTable tbody');
+                productList.forEach(product => {
+                    const row = `<tr><td>${product.title}</td><td>${product.price}</td></tr>`;
+                    productTableBody.insertAdjacentHTML('beforeend', row);
+                });
+            })
+            .catch(error => console.log(error));
+    </script>
+</body>
+
+</html>
